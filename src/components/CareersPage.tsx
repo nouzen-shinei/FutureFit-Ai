@@ -1,0 +1,110 @@
+import { motion, AnimatePresence } from 'framer-motion';
+import { Career } from '../types';
+import { CareerNode } from './CareerNode';
+import { LoadingState } from './LoadingState';
+import { ErrorState } from './ErrorState';
+import { ArrowRight, LineChart } from 'lucide-react';
+
+interface CareersPageProps {
+  careers: Career[];
+  selectedCareers: Career[];
+  onCareerSelect: (career: Career) => void;
+  onAnalyze: (career: Career) => void;
+  onCompare: () => void;
+  isLoading?: boolean;
+  error?: string;
+  onRetry?: () => void;
+}
+
+export function CareersPage({
+  careers,
+  selectedCareers,
+  onCareerSelect,
+  onAnalyze,
+  onCompare,
+  isLoading,
+  error,
+  onRetry
+}: CareersPageProps) {
+  if (isLoading) {
+    return <LoadingState type="career" />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={onRetry} />;
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Header with selection info */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <h2 className="text-2xl font-bold">Recommended Careers</h2>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-gray-400">
+            {selectedCareers.length === 0
+              ? "Select up to 2 careers to compare"
+              : selectedCareers.length === 1
+              ? "Select 1 more career to compare"
+              : "Ready to compare!"}
+          </div>
+          {selectedCareers.length > 0 && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              onClick={() => selectedCareers.length === 1 ? onAnalyze(selectedCareers[0]) : onCompare()}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+            >
+              <LineChart className="w-4 h-4" />
+              <span>{selectedCareers.length === 1 ? 'Analyze Career' : 'Compare Careers'}</span>
+            </motion.button>
+          )}
+        </div>
+      </div>
+
+      {/* Selected Careers Preview */}
+      {selectedCareers.length > 0 && (
+        <div className="glass-card p-4 rounded-xl">
+          <div className="flex items-center gap-4">
+            {selectedCareers.map((career, index) => (
+              <div key={career.id} className="flex items-center gap-4">
+                <div className="flex-1 p-4 bg-white/5 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{career.type}</span>
+                    <h3 className="font-semibold">{career.title}</h3>
+                  </div>
+                  <div className="text-sm text-gray-400 mt-1">
+                    {career.salary.current} • {career.demand} Demand
+                  </div>
+                </div>
+                {index === 0 && selectedCareers.length === 2 && (
+                  <ArrowRight className="w-6 h-6 text-gray-400" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Career Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <AnimatePresence>
+          {careers.map((career) => (
+            <motion.div
+              key={career.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <CareerNode
+                career={career}
+                isSelected={selectedCareers.some(c => c.id === career.id)}
+                onClick={() => onCareerSelect(career)}
+                onAnalyze={() => onAnalyze(career)}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
