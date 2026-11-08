@@ -23,7 +23,9 @@ export interface CareerAiResult {
   body: unknown
 }
 
-export const DEFAULT_MODEL = 'gemini-2.5-flash'
+// gemini-2.5-flash is deprecated (requests to it are routed to gemini-3.5-flash-lite from
+// December 1, 2026). Gemini 3.5 Flash-Lite is the recommended replacement, at the same price.
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 const DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com'
 const MAX_RESUME_TEXT = 30_000
 const MAX_RESUME_BASE64 = 2_800_000 // about 2 MB of PDF data
@@ -219,9 +221,12 @@ async function callGemini(parts: Part[], config: CareerAiConfig): Promise<unknow
   const base = (config.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, '')
   const model = config.model || DEFAULT_MODEL
   const timeoutMs = config.timeoutMs ?? 25_000
-  const generationConfig: Record<string, unknown> = { responseMimeType: 'application/json', temperature: 0.7 }
+  const generationConfig: Record<string, unknown> = { responseMimeType: 'application/json' }
+  // Gemini 3 and later deprecate `temperature` and use their own thinking defaults (3.5 Flash-Lite
+  // thinks minimally), so these settings are only sent to the older 2.x models.
+  if (/^gemini-[12]\./.test(model)) generationConfig.temperature = 0.7
   // Gemini 2.5 Flash "thinks" before answering by default, which makes the answer noticeably slower.
-  // These structured answers do not need it. (Other models handle thinking settings differently.)
+  // These structured answers do not need it.
   if (/^gemini-2\.5-flash/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 }
   const request = {
     method: 'POST',

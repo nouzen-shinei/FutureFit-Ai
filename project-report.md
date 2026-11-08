@@ -106,7 +106,7 @@ FutureFit AI is an innovative web application that helps users navigate their ca
   - The Gemini key (`GEMINI_API_KEY`) stays on the server and is never sent to the browser
 
 - **AI Integration:**
-  - Google Gemini (`gemini-2.5-flash`, JSON output mode) through its REST API
+  - Google Gemini (`gemini-3.5-flash-lite`, JSON output mode) through its REST API
   - Tasks: career recommendations, reviews and learning resources, resume skill extraction (PDF or text)
 
 - **Database:** none at present. `supabase/migrations/` contains an earlier schema for market data,

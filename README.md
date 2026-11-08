@@ -24,7 +24,7 @@ unavailable. See [`project-report.md`](project-report.md) for the full feature o
 | --- | --- |
 | Frontend | React 18, TypeScript 5.9, Tailwind CSS 3, Framer Motion, Recharts, Lucide icons |
 | Build | Vite 8, ESLint 9 (typescript-eslint, react-hooks), PostCSS, Autoprefixer |
-| AI | Google Gemini REST API (`gemini-2.5-flash`, JSON output), called only from the server |
+| AI | Google Gemini REST API (`gemini-3.5-flash-lite`, JSON output), called only from the server |
 | Hosting | Netlify (static site + Netlify Function) |
 
 ## Getting started
@@ -43,7 +43,7 @@ npm run dev               # http://localhost:5173
 | Variable | Required | Description |
 | --- | --- | --- |
 | `GEMINI_API_KEY` | yes | Google Gemini API key, read on the server only |
-| `GEMINI_MODEL` | no | Model name, default `gemini-2.5-flash` |
+| `GEMINI_MODEL` | no | Model name, default `gemini-3.5-flash-lite` |
 | `GEMINI_API_BASE` | no | API base URL, default `https://generativelanguage.googleapis.com` |
 
 The browser never sees the API key. It calls the app's own endpoint `POST /api/career-ai`, which
