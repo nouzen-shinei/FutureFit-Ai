@@ -1,7 +1,27 @@
+# Netlify configuration for FutureFit AI.
+# The Node.js version comes from .nvmrc.
+# Set GEMINI_API_KEY (and optionally GEMINI_MODEL) in the Netlify UI under
+# Project configuration > Environment variables, with the "Functions" scope.
+# Do not put the key in this file: it is committed to the repository.
+
 [build]
   command = "npm run build"
   publish = "dist"
 
+# netlify/functions/career-ai.mts serves POST /api/career-ai (path set in the file's `config` export).
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Vite adds a content hash to every file name in /assets, so these files can be cached for a year.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"

@@ -94,9 +94,24 @@ Errors return `{ error }` with a matching HTTP status. Request bodies are limite
 
 ## Deploy (Netlify)
 
-`netlify.toml` builds the site with `npm run build`, publishes `dist/` and deploys
-`netlify/functions/career-ai.mts`, which answers `/api/career-ai`. In the Netlify site settings, add
-the environment variable `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`).
+`netlify.toml` builds the site with `npm run build`, publishes `dist/`, deploys
+`netlify/functions/career-ai.mts` (which answers `/api/career-ai`) and sets cache and security
+headers. Netlify picks the Node.js version from `.nvmrc`.
+
+1. In the Netlify dashboard, choose **Add new project > Import an existing project > GitHub**.
+2. Authorize Netlify and select this repository. If it is not listed, use the link to configure the
+   Netlify app on GitHub and give it access to the repository.
+3. Keep the build settings that Netlify reads from `netlify.toml` (branch `main`, build command
+   `npm run build`, publish directory `dist`).
+4. Add the environment variable `GEMINI_API_KEY` with the **Functions** scope (optionally also
+   `GEMINI_MODEL`). You can do this on the import page or later under
+   **Project configuration > Environment variables**.
+5. Deploy. Every push to `main` then redeploys the site. After changing an environment variable,
+   trigger a new deploy so the function picks it up.
 
 If an older build of this app was ever published, its JavaScript contained the Gemini key. Create a
 new key in Google AI Studio and delete the old one.
+
+## License
+
+[MIT](LICENSE) © 2026 Vikrant Kumar
