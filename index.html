@@ -2,15 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FutureFit AI - Your Personal Ai Powered Career Path Advisor</title>
+    <meta name="theme-color" content="#1e1b4b" />
+    <meta name="description" content="FutureFit AI suggests careers for the Indian job market from your education, skills and interests." />
+    <title>FutureFit AI - Your Personal AI-Powered Career Path Advisor</title>
+    <!-- Dark background before the app has loaded, so there is no white flash -->
+    <style>
+      html, body { background: #111827; color: #e5e7eb; }
+    </style>
   </head>
   <body>
+    <noscript>FutureFit AI needs JavaScript to run.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

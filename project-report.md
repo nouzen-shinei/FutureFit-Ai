@@ -37,10 +37,10 @@ FutureFit AI is an innovative web application that helps users navigate their ca
   - Proficiency levels:
     - Basic
     - Intermediate
-    - Expert
     - Advanced
+    - Expert
   - Auto-completion and suggestions
-  - Resume parsing for skill extraction
+  - Resume parsing for skill extraction (PDF or plain text)
 
 - **Interests & Hobbies**
   - Primary/secondary interest classification
@@ -99,44 +99,35 @@ FutureFit AI is an innovative web application that helps users navigate their ca
 - **Loading States:** React Loading Skeleton
 
 ### Backend Services
-- **Database:** Supabase
-  - Market demand data
-  - Career reviews
-  - Job news
-  - Row-level security
+- **AI endpoint:** `POST /api/career-ai`
+  - Served by a Vite plugin during `npm run dev` / `npm run preview` (`vite.config.ts`)
+  - Served by a Netlify Function in production (`netlify/functions/career-ai.mts`)
+  - Shared logic in `server/careerAi.ts`: input validation, prompts, Gemini call, reply parsing
+  - The Gemini key (`GEMINI_API_KEY`) stays on the server and is never sent to the browser
 
 - **AI Integration:**
-  - Google's Generative AI (Gemini)
-  - OpenRouter API
-  - Resume parsing capabilities
+  - Google Gemini (`gemini-2.5-flash`, JSON output mode) through its REST API
+  - Tasks: career recommendations, reviews and learning resources, resume skill extraction (PDF or text)
+
+- **Database:** none at present. `supabase/migrations/` contains an earlier schema for market data,
+  reviews and job news; the app does not read from it, and the Supabase project it was written for no
+  longer exists.
 
 ### Key Technical Features
 - Responsive design
 - Mobile-optimized interactions
-- Auto-save functionality
+- Profile saved in the browser after every change
 - Real-time form validation
 - Smooth transitions and animations
 - Auto-complete with keyboard navigation
 - Local storage persistence
 - Error handling and recovery
 
-## Database Schema
+## Database Schema (not in use)
 
-### Tables
-1. **market_demand**
-   - Historical market trends
-   - Demand-supply metrics
-   - Year-wise analysis
-
-2. **career_reviews**
-   - User testimonials
-   - Rating system
-   - Pros and cons
-
-3. **job_news**
-   - Latest opportunities
-   - Industry updates
-   - Event announcements
+`supabase/migrations/20250403193331_calm_river.sql` describes three read-only tables
+(`market_demand`, `career_reviews`, `job_news`). They are kept for a possible future version; the
+current app generates this data with Gemini and uses built-in examples as a fallback.
 
 ## Future Scope
 
@@ -190,17 +181,14 @@ FutureFit AI is an innovative web application that helps users navigate their ca
 ## Development Tools
 
 ### Core Technologies
-- Vite (Build tool)
-- TypeScript
-- React
-- Tailwind CSS
-- Supabase
-- Google Generative AI
+- Vite 8 (build tool and local server)
+- TypeScript 5.9
+- React 18
+- Tailwind CSS 3
+- Google Gemini API (server side)
 
 ### Development Environment
-- ESLint
-- Prettier
-- TypeScript ESLint
+- ESLint 9 with typescript-eslint and react-hooks rules
 - PostCSS
 - Autoprefixer
 
@@ -213,28 +201,21 @@ FutureFit AI is an innovative web application that helps users navigate their ca
 
 ## Project Structure
 ```
-project/
+FutureFit/
+├── index.html
+├── public/                  icons and web app manifest
+├── server/careerAi.ts       server-side AI logic (shared)
+├── netlify/functions/       production endpoint /api/career-ai
+├── netlify.toml
+├── vite.config.ts           dev/preview endpoint /api/career-ai
 ├── src/
-│   ├── components/
-│   │   ├── AnalysisPage
-│   │   ├── AutoComplete
-│   │   ├── CareersPage
-│   │   ├── ComparePage
-│   │   ├── ErrorState
-│   │   ├── GenerateButton
-│   │   ├── LoadingState
-│   │   └── Logo
-│   ├── data/
-│   │   ├── careers
-│   │   ├── news
-│   │   └── reviews
-│   ├── lib/
-│   │   ├── ai
-│   │   └── openrouter
-│   └── types/
-├── public/
-└── supabase/
-    └── migrations/
+│   ├── App1.tsx             profile form, navigation, page switching
+│   ├── components/          AnalysisPage, AutoComplete, CareerNode, CareersPage,
+│   │                        ErrorState, GenerateButton, LoadingState, Logo
+│   ├── data/                built-in example careers, reviews and listings
+│   ├── lib/ai.ts            client calls to /api/career-ai
+│   └── types.ts
+└── supabase/migrations/     earlier database schema (not used)
 ```
 
 ## Conclusion

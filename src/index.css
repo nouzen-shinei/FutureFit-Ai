@@ -76,18 +76,25 @@ input[type="range"]::-moz-range-thumb {
   .career-node:hover {
     transform: translateY(-2px);
   }
-
-  .career-node[data-type="🌱"] {
-    transform: scale(1.05) rotate(2deg);
-  }
 }
 
+/* Card accents by career type ("^=" also matches the emoji with its variation selector) */
 .career-node[data-type="💎"] {
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.333);
 }
 
-.career-node[data-type="⚠️"] {
-  animation: pulse-red 1.5s infinite;
+.career-node[data-type="🌱"] {
+  border-color: rgba(132, 204, 22, 0.45);
+}
+
+.career-node[data-type^="⚠"] {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .career-node[data-type^="⚠"] {
+    animation: pulse-red 2.5s infinite;
+  }
 }
 
 @keyframes pulse-red {

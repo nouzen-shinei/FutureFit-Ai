@@ -1,6 +1,9 @@
+// 1 = Basic, 2 = Intermediate, 3 = Advanced, 4 = Expert
+export type SkillLevel = 1 | 2 | 3 | 4;
+
 export interface Skill {
   name: string;
-  level: 1 | 2 | 3 | 4;
+  level: SkillLevel;
 }
 
 export interface Interest {
@@ -67,7 +70,7 @@ export interface Career {
   salary: CareerSalary;
   cost: string;
   timeline: string;
-  totalTime: string;
+  totalTime?: string;
   demand: string;
   ai_risk: number;
   satisfaction: number;
@@ -80,6 +83,7 @@ export interface Career {
   news: string[];
   notableProfessionals: NotablePerson[];
   marketDemandHistory: MarketDemand[];
+  reviews?: UserReview[];
 }
 
 export interface UserReview {
@@ -96,6 +100,7 @@ export interface UserReview {
 
 export interface NewsItem {
   id: number;
+  career: string;
   title: string;
   company: string;
   location: string;
@@ -106,9 +111,15 @@ export interface NewsItem {
   type: 'job' | 'news' | 'event';
 }
 
+export interface Education {
+  level: string;
+  stream: string;
+  status: string;
+}
+
 export interface UserProfile {
   age: number;
-  education: string;
+  education: Education;
   skills: Skill[];
   interests: Interest[];
   hobbies: Hobby[];

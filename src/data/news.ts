@@ -1,9 +1,12 @@
 import { NewsItem } from '../types';
 
+// Example listings from 2024, kept for illustration. They are shown only for the matching career and
+// are labelled as examples in the interface; live searches are linked for every career.
 export const CAREER_NEWS: NewsItem[] = [
   // AI/ML Engineer Opportunities
   {
     id: 1,
+    career: "AI/ML Engineer",
     title: "Senior AI/ML Engineer - Large Language Models",
     company: "Microsoft",
     location: "Bangalore/Hyderabad",
@@ -15,6 +18,7 @@ export const CAREER_NEWS: NewsItem[] = [
   },
   {
     id: 2,
+    career: "AI/ML Engineer",
     title: "AI Research Scientist",
     company: "Google India",
     location: "Bangalore",
@@ -27,6 +31,7 @@ export const CAREER_NEWS: NewsItem[] = [
   // Data Science Manager Opportunities
   {
     id: 3,
+    career: "Data Science Manager",
     title: "Lead Data Science Manager",
     company: "Flipkart",
     location: "Bangalore",
@@ -38,6 +43,7 @@ export const CAREER_NEWS: NewsItem[] = [
   },
   {
     id: 4,
+    career: "AI/ML Engineer",
     title: "AI/ML Summit 2024",
     company: "Indian Institute of Technology",
     location: "Virtual & Delhi",
@@ -49,6 +55,7 @@ export const CAREER_NEWS: NewsItem[] = [
   // Cloud Architecture Opportunities
   {
     id: 5,
+    career: "Cloud Solutions Architect",
     title: "Principal Cloud Architect",
     company: "Amazon Web Services",
     location: "Hybrid - Mumbai",
@@ -60,6 +67,7 @@ export const CAREER_NEWS: NewsItem[] = [
   },
   {
     id: 6,
+    career: "Cloud Solutions Architect",
     title: "Cloud Security Workshop Series",
     company: "Microsoft Azure",
     location: "Online",

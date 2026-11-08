@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Star, LineChart, Users, Clock, GraduationCap, Brain, DollarSign } from 'lucide-react';
+import { LineChart, Users, Clock, GraduationCap, Brain, DollarSign } from 'lucide-react';
 import { Career } from '../types';
 
 interface CareerNodeProps {
@@ -9,33 +9,36 @@ interface CareerNodeProps {
   onAnalyze: () => void;
 }
 
-export function CareerNode({ career, isSelected, onClick, onAnalyze }: CareerNodeProps) {
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }).map((_, i) => (
-      <Star
-        key={i}
-        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'}`}
-      />
-    ));
-  };
+const TYPE_LABEL: Record<Career['type'], string> = {
+  '💎': 'High potential',
+  '⚠️': 'At risk of automation',
+  '🌱': 'Emerging field',
+};
 
+export function CareerNode({ career, isSelected, onClick, onAnalyze }: CareerNodeProps) {
   return (
     <motion.div
       className={`career-node relative cursor-pointer transition-all ${
         isSelected ? 'ring-2 ring-blue-400' : 'hover:bg-white/10'
-      } ${
-        career.type === '💎'
-          ? 'shadow-[0_0_15px_rgba(0,255,136,0.3)]'
-          : career.type === '⚠️'
-          ? 'animate-pulse border-red-500/50'
-          : 'scale-105 rotate-2'
       }`}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-pressed={isSelected}
       whileHover={{ y: -4 }}
       data-type={career.type}
     >
       <div className="flex items-start justify-between mb-4">
-        <span className="text-2xl">{career.type}</span>
+        <span className="flex items-center gap-2">
+          <span className="text-2xl" aria-hidden="true">{career.type}</span>
+          <span className="text-xs text-gray-400">{TYPE_LABEL[career.type]}</span>
+        </span>
         <div className="text-right">
           <div className="text-xl font-bold text-green-400">{career.salary.current}</div>
           <div className="text-sm text-gray-400">{career.demand} Demand</div>
@@ -56,7 +59,7 @@ export function CareerNode({ career, isSelected, onClick, onAnalyze }: CareerNod
               <span>Timeline</span>
             </div>
             <div>{career.timeline}</div>
-            <div className="text-xs text-gray-500">Total: {career.totalTime}</div>
+            {career.totalTime && <div className="text-xs text-gray-500">To senior level: {career.totalTime}</div>}
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-gray-400">
@@ -212,10 +215,12 @@ export function CareerNode({ career, isSelected, onClick, onAnalyze }: CareerNod
 
         {/* Analysis Button - Now positioned with proper spacing */}
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             onAnalyze();
           }}
+          onKeyDown={(e) => e.stopPropagation()}
           className="absolute bottom-4 right-4 flex items-center space-x-2 px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors text-sm"
         >
           <LineChart className="w-4 h-4" />

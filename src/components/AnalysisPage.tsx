@@ -1,10 +1,21 @@
-import { LineChart as LineChartIcon, TrendingUp, Users, BookOpen, BriefcaseIcon, Brain, DollarSign, Clock, Award, Star, MessageSquare, ThumbsUp, ThumbsDown, ExternalLink, GraduationCap, BookOpenCheck, MapPin, Building2, ArrowUpRight, Sparkles, Target, Trophy, Briefcase } from 'lucide-react';
+import { LineChart as LineChartIcon, TrendingUp, Users, BookOpen, BriefcaseIcon, Brain, DollarSign, Clock, Award, Star, MessageSquare, ThumbsUp, ThumbsDown, ExternalLink, GraduationCap, BookOpenCheck, MapPin, Building2, ArrowUpRight, Target, Trophy, Info, Search } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { Career } from '../types';
 import { LoadingState } from './LoadingState';
 import { ErrorState } from './ErrorState';
-import { USER_REVIEWS } from '../data/reviews';
 import { CAREER_NEWS } from '../data/news';
+
+const demandScore = (career?: Career) => (career ? parseInt(career.demand, 10) || 0 : 0);
+
+// Job portals searched for every career; the built-in listings are only examples.
+const JOB_SEARCHES = [
+  { name: 'LinkedIn Jobs', url: (q: string) => `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(q)}&location=India` },
+  { name: 'Naukri', url: (q: string) => `https://www.naukri.com/jobs-in-india?k=${encodeURIComponent(q)}` },
+  { name: 'Indeed India', url: (q: string) => `https://in.indeed.com/jobs?q=${encodeURIComponent(q)}` },
+];
+
+const courseSearchUrl = (name: string, platform: string) =>
+  `https://www.google.com/search?q=${encodeURIComponent(`${name} ${platform} course`)}`;
 
 interface AnalysisPageProps {
   careers: Career[];
@@ -32,44 +43,46 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
     );
   }
 
-  // Single career analysis data
-  const career = careers[0];
+  const [first, second] = careers;
 
-  // Generate radar chart data from careers
+  // Radar values are scaled to 0-100 so that the four axes are comparable.
   const radarData = [
-    {
-      subject: 'Market Demand',
-      A: parseInt(careers[0].demand),
-      B: careers[1]?.demand ? parseInt(careers[1].demand) : 0
-    },
-    {
-      subject: 'Job Satisfaction',
-      A: careers[0].satisfaction * 20,
-      B: careers[1]?.satisfaction ? careers[1].satisfaction * 20 : 0
-    },
-    {
-      subject: 'AI Risk',
-      A: 100 - careers[0].ai_risk,
-      B: careers[1]?.ai_risk ? 100 - careers[1].ai_risk : 0
-    },
-    {
-      subject: 'Required Skills',
-      A: careers[0].skills.length * 10,
-      B: careers[1]?.skills ? careers[1].skills.length * 10 : 0
-    }
+    { subject: 'Market Demand', A: demandScore(first), B: demandScore(second) },
+    { subject: 'Job Satisfaction', A: first.satisfaction * 20, B: second ? second.satisfaction * 20 : 0 },
+    { subject: 'Safety from AI', A: 100 - first.ai_risk, B: second ? 100 - second.ai_risk : 0 },
+    { subject: 'Skills to Learn', A: Math.min(100, first.skills.length * 10), B: second ? Math.min(100, second.skills.length * 10) : 0 },
   ];
 
+  // One row per year with a demand value for each career (the chart needs a single shared data array).
+  const years = [...new Set(careers.flatMap((c) => c.marketDemandHistory.map((h) => h.year)))].sort((a, b) => a - b);
+  const trendData = years.map((year) => {
+    const row: Record<string, number | null> = { year };
+    careers.forEach((c, i) => {
+      row[`c${i}`] = c.marketDemandHistory.find((h) => h.year === year)?.demand ?? null;
+    });
+    return row;
+  });
+
   const renderStars = (rating: number) => {
+    const filled = Math.round(rating);
     return Array.from({ length: 5 }).map((_, i) => (
       <Star
         key={i}
-        className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'}`}
+        aria-hidden="true"
+        className={`w-4 h-4 ${i < filled ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'}`}
       />
     ));
   };
 
   return (
     <div className="space-y-8">
+      <p className="flex items-start gap-2 text-sm text-gray-400">
+        <Info className="w-4 h-4 mt-0.5 shrink-0" />
+        <span>
+          All figures, reviews and names on this page are AI-generated estimates for the Indian market. Use them as a
+          starting point and check them with official sources.
+        </span>
+      </p>
       {/* Career Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {careers.map((career) => (
@@ -104,7 +117,7 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                   <Trophy className="w-4 h-4" />
                   <span>Job Satisfaction</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center" role="img" aria-label={`${career.satisfaction} out of 5 stars`}>
                   {renderStars(career.satisfaction)}
                 </div>
                 <div className="text-sm text-gray-400 mt-1">{career.satisfaction} / 5</div>
@@ -119,7 +132,7 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                   <span>Timeline</span>
                 </div>
                 <div>{career.timeline}</div>
-                <div className="text-sm text-gray-500">Total: {career.totalTime}</div>
+                {career.totalTime && <div className="text-sm text-gray-500">To senior level: {career.totalTime}</div>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-gray-400">
@@ -226,10 +239,10 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
           </h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart>
+              <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="year" stroke="rgba(255,255,255,0.5)" />
-                <YAxis stroke="rgba(255,255,255,0.5)" />
+                <YAxis stroke="rgba(255,255,255,0.5)" domain={[0, 100]} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(17, 24, 39, 0.9)',
@@ -242,9 +255,9 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                   <Line
                     key={career.id}
                     type="monotone"
-                    data={career.marketDemandHistory}
                     name={`${career.title} (Demand)`}
-                    dataKey="demand"
+                    dataKey={`c${index}`}
+                    connectNulls
                     stroke={index === 0 ? "#3B82F6" : "#8B5CF6"}
                     strokeWidth={2}
                     dot={false}
@@ -326,8 +339,11 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
       <div className="glass-card p-6 rounded-xl">
         <h3 className="text-xl font-semibold mb-6 flex items-center space-x-2">
           <MessageSquare className="w-5 h-5 text-yellow-400" />
-          <span>User Reviews</span>
+          <span>Example Reviews</span>
         </h3>
+        <p className="text-sm text-gray-400 -mt-4 mb-6">
+          These reviews are AI-generated examples of typical experiences, not statements by real people.
+        </p>
         <div className="space-y-8">
           {careers.map((career) => (
             <div key={career.id} className="space-y-4 w-full">
@@ -383,6 +399,7 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
           <Users className="w-5 h-5 text-blue-400" />
           <span>Notable Professionals</span>
         </h3>
+        <p className="text-sm text-gray-400 -mt-4 mb-6">Names suggested by the AI-generated analysis. Verify them before relying on them.</p>
         <div className="space-y-8">
           {careers.map((career) => (
             <div key={career.id} className="space-y-4">
@@ -422,12 +439,29 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
           {careers.map((career) => (
             <div key={career.id} className="space-y-4">
               <h4 className="font-medium text-gray-300">{career.title}</h4>
+              <div className="flex flex-wrap gap-2">
+                {JOB_SEARCHES.map((site) => (
+                  <a
+                    key={site.name}
+                    href={site.url(career.title)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors text-sm"
+                  >
+                    <Search className="w-4 h-4" />
+                    <span>Search {site.name}</span>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+                ))}
+              </div>
+              {CAREER_NEWS.some((news) => news.career === career.title) && (
+                <p className="text-xs text-gray-500">Example listings from 2024, shown for illustration:</p>
+              )}
               <div className="space-y-4">
                 {CAREER_NEWS
-                  .filter(news => news.company.toLowerCase().includes(career.title.toLowerCase()))
+                  .filter((news) => news.career === career.title)
                   .map((news) => (
                     <div key={news.id} className="p-4 bg-white/5 rounded-lg space-y-3">
-                      {/* News Type Badge */}
                       <div className="flex items-center justify-between">
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           news.type === 'job'
@@ -440,8 +474,6 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                         </span>
                         <span className="text-sm text-gray-400">{news.date}</span>
                       </div>
-
-                      {/* Title and Company */}
                       <div className="space-y-1">
                         <h5 className="font-medium text-lg">{news.title}</h5>
                         <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -456,43 +488,12 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                           )}
                         </div>
                       </div>
-
-                      {/* Description */}
                       <p className="text-sm text-gray-300">{news.description}</p>
-
-                      {/* Salary if available */}
                       {news.salary && (
                         <div className="flex items-center gap-2 text-green-400">
                           <DollarSign className="w-4 h-4" />
                           <span className="text-sm">{news.salary}</span>
                         </div>
-                      )}
-
-                      {/* Action Button */}
-                      {news.url && (
-                        <a
-                          href={news.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors text-sm mt-2"
-                        >
-                          {news.type === 'job' ? (
-                            <>
-                              <span>Apply Now</span>
-                              <ArrowUpRight className="w-4 h-4" />
-                            </>
-                          ) : news.type === 'event' ? (
-                            <>
-                              <span>Register</span>
-                              <ArrowUpRight className="w-4 h-4" />
-                            </>
-                          ) : (
-                            <>
-                              <span>Read More</span>
-                              <ArrowUpRight className="w-4 h-4" />
-                            </>
-                          )}
-                        </a>
                       )}
                     </div>
                   ))}
@@ -538,10 +539,10 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                     <span className="font-medium">Online Courses</span>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                    {career.resources.courses.map((course: { name: string; platform: string; duration: string; level: string; certificate: boolean; free: boolean }, index) => (
-                      <div
+                    {career.resources.courses.map((course, index) => (
+                      <a
                         key={index}
-                        href={`https://${course.platform.toLowerCase().replace(/\s+/g, '')}.com/search?q=${encodeURIComponent(course.name)}`}
+                        href={courseSearchUrl(course.name, course.platform)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-3 bg-white/5 rounded-lg flex items-center justify-between hover:bg-white/10 transition-colors group"
@@ -561,7 +562,7 @@ export function AnalysisPage({ careers, isLoading, error, onRetry }: AnalysisPag
                           </div>
                         </div>
                         <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-400 transition-colors" />
-                      </div>
+                      </a>
                     ))}
                   </div>
                 </div>

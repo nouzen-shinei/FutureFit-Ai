@@ -1,241 +1,102 @@
-# FutureFit AI - Your Personal AI-Powered Career Path Advisor
+# FutureFit AI
 
-## Project Overview
-**Tagline:** "Degrees to Destiny"
+**Degrees to Destiny.** An AI career path advisor for the Indian job market.
 
-FutureFit AI is an innovative web application that helps users navigate their career paths by providing personalized career recommendations based on their skills, interests, education, and market trends. The platform leverages artificial intelligence to analyze user profiles and generate detailed career insights tailored to the Indian job market.
+Enter your age, education, skills, interests and hobbies (or upload a PDF or text resume) and
+FutureFit AI suggests careers, compares them side by side and lists reviews and learning resources.
+Suggestions come from Google Gemini; the app falls back to built-in examples when the AI is
+unavailable. See [`project-report.md`](project-report.md) for the full feature overview.
 
-## Core Features
+## Features
 
-### 1. User Profile Creation
-- **Age Analysis**
-  - Dynamic age slider (13-65 years)
-  - Life phase categorization:
-    - Early Learning Phase (≤19)
-    - Early Career Phase (20-29)
-    - Career Growth Phase (30-50)
-    - Career Mastery Phase (>50)
+- **Profile builder:** age slider with life-phase labels, education level and stream, up to 15
+  skills with proficiency levels, interests and hobbies, with auto-complete. The profile is saved
+  in the browser after every change.
+- **Resume import:** extracts skills from a PDF or plain-text resume.
+- **Career recommendations:** high-potential, emerging and at-risk careers with salary ranges,
+  market demand, automation risk, required skills, exams and timelines.
+- **Analysis and comparison:** demand trends, radar and salary charts, reviews, learning
+  resources and job listings.
 
-- **Education Details**
-  - Multiple education levels:
-    - School (9th-12th)
-    - Diploma Programs
-    - Associate Degrees
-    - Undergraduate Degrees
-    - Postgraduate Degrees
-    - Doctorate Programs
-  - Comprehensive stream/branch options
-  - Education status tracking
+## Tech stack
 
-- **Skills Management**
-  - Up to 15 skills per profile
-  - Skill categorization:
-    - Technical Skills
-    - Design Skills
-    - Business Skills
-    - Soft Skills
-  - Proficiency levels:
-    - Basic
-    - Intermediate
-    - Expert
-    - Advanced
-  - Auto-completion and suggestions
-  - Resume parsing for skill extraction
+| Area | Tools |
+| --- | --- |
+| Frontend | React 18, TypeScript 5.9, Tailwind CSS 3, Framer Motion, Recharts, Lucide icons |
+| Build | Vite 8, ESLint 9 (typescript-eslint, react-hooks), PostCSS, Autoprefixer |
+| AI | Google Gemini REST API (`gemini-2.5-flash`, JSON output), called only from the server |
+| Hosting | Netlify (static site + Netlify Function) |
 
-- **Interests & Hobbies**
-  - Primary/secondary interest classification
-  - Categorized hobbies:
-    - Creative
-    - Physical
-    - Intellectual
-  - Custom hobby addition with emoji support
-  - Predefined suggestions
+## Getting started
 
-### 2. Career Recommendations
-- **Career Types**
-  - 💎 High-potential careers
-  - 🌱 Emerging opportunities
-  - ⚠️ At-risk professions
+Requirements: Node.js 20.19+ or 22.12+ (`.nvmrc` pins 22) and a
+[Gemini API key](https://aistudio.google.com/app/apikey).
 
-- **Detailed Career Information**
-  - Salary ranges (Entry, Average, Senior)
-  - Market demand scores
-  - AI automation risk assessment
-  - Job satisfaction ratings
-  - Required skills and qualifications
-  - Timeline and investment details
-  - Growth potential (CAGR)
-  - Required examinations
-  - Prerequisites
-
-### 3. Analysis & Comparison
-- **Market Analysis**
-  - Historical demand trends
-  - Supply-demand dynamics
-  - Growth projections
-  - Industry insights
-
-- **Career Comparison**
-  - Side-by-side comparison
-  - Radar charts for multiple metrics
-  - Salary progression analysis
-  - Skill requirement comparison
-
-- **Detailed Insights**
-  - User reviews and experiences
-  - Notable professionals
-  - Learning resources
-  - Job opportunities
-  - Industry news
-
-## Technical Implementation
-
-### Frontend Technologies
-- **Core Framework:** React with TypeScript
-- **Styling:** Tailwind CSS
-- **Animations:** Framer Motion
-- **Icons:** Lucide React
-- **Charts:** Recharts
-- **Loading States:** React Loading Skeleton
-
-### Backend Services
-- **Database:** Supabase
-  - Market demand data
-  - Career reviews
-  - Job news
-  - Row-level security
-
-- **AI Integration:**
-  - Google's Generative AI (Gemini)
-  - OpenRouter API
-  - Resume parsing capabilities
-
-### Key Technical Features
-- Responsive design
-- Mobile-optimized interactions
-- Auto-save functionality
-- Real-time form validation
-- Smooth transitions and animations
-- Auto-complete with keyboard navigation
-- Local storage persistence
-- Error handling and recovery
-
-## Database Schema
-
-### Tables
-1. **market_demand**
-   - Historical market trends
-   - Demand-supply metrics
-   - Year-wise analysis
-
-2. **career_reviews**
-   - User testimonials
-   - Rating system
-   - Pros and cons
-
-3. **job_news**
-   - Latest opportunities
-   - Industry updates
-   - Event announcements
-
-## Future Scope
-
-### Planned Features
-1. **Enhanced AI Integration**
-   - Personalized learning paths
-   - Skill gap analysis
-   - Career transition recommendations
-
-2. **Community Features**
-   - Mentor connections
-   - Peer networking
-   - Success stories
-
-3. **Learning Integration**
-   - Course recommendations
-   - Certification tracking
-   - Learning progress monitoring
-
-4. **Market Intelligence**
-   - Salary negotiation insights
-   - Company-specific trends
-   - Regional market analysis
-
-5. **Profile Enhancements**
-   - Portfolio integration
-   - Achievement tracking
-   - Skill endorsements
-
-6. **Mobile Application**
-   - Native mobile apps
-   - Offline capabilities
-   - Push notifications
-
-### Potential Updates
-1. **Advanced Analytics**
-   - Predictive career modeling
-   - Success probability scores
-   - Custom metrics tracking
-
-2. **Interactive Features**
-   - Virtual career counseling
-   - Mock interviews
-   - Skill assessments
-
-3. **Integration Possibilities**
-   - Job portal connections
-   - LinkedIn integration
-   - Educational platform partnerships
-
-## Development Tools
-
-### Core Technologies
-- Vite (Build tool)
-- TypeScript
-- React
-- Tailwind CSS
-- Supabase
-- Google Generative AI
-
-### Development Environment
-- ESLint
-- Prettier
-- TypeScript ESLint
-- PostCSS
-- Autoprefixer
-
-### Version Control
-- Git
-- GitHub
-
-### Deployment
-- Netlify
-
-## Project Structure
+```bash
+npm install
+cp .env.example .env      # then put your Gemini key in GEMINI_API_KEY
+npm run dev               # http://localhost:5173
 ```
-project/
+
+### Environment variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | yes | Google Gemini API key, read on the server only |
+| `GEMINI_MODEL` | no | Model name, default `gemini-2.5-flash` |
+| `GEMINI_API_BASE` | no | API base URL, default `https://generativelanguage.googleapis.com` |
+
+The browser never sees the API key. It calls the app's own endpoint `POST /api/career-ai`, which
+`vite.config.ts` serves during `npm run dev` and `npm run preview`, and which uses `GEMINI_API_KEY`
+on the server. Do not rename the variable to `VITE_GEMINI_API_KEY`: Vite would then copy the key into
+the JavaScript that every visitor downloads.
+
+## Scripts
+
+```bash
+npm run dev         # local dev server with the API endpoint
+npm run typecheck   # tsc -b
+npm run lint        # ESLint 9, no warnings allowed
+npm run build       # type check + production build into dist/
+npm run preview     # serve dist/ with the API endpoint
+```
+
+## API
+
+`POST /api/career-ai` takes a JSON body with a `task` field:
+
+| `task` | Other fields | Response |
+| --- | --- | --- |
+| `recommendations` | `profile` | `{ careers }` |
+| `details` | `titles` (career titles) | `{ details }` (reviews and learning resources) |
+| `resume-skills` | `resume` (`text/plain` text or base64 `application/pdf`) | `{ skills }` |
+
+Errors return `{ error }` with a matching HTTP status. Request bodies are limited to 4 MB.
+
+## Project structure
+
+```
+├── index.html
+├── public/                  icons and web app manifest
+├── server/careerAi.ts       server-side AI logic: validation, prompts, Gemini call, parsing
+├── netlify/functions/       production endpoint /api/career-ai
+├── netlify.toml
+├── vite.config.ts           dev/preview endpoint /api/career-ai
 ├── src/
-│   ├── components/
-│   │   ├── AnalysisPage
-│   │   ├── AutoComplete
-│   │   ├── CareersPage
-│   │   ├── ComparePage
-│   │   ├── ErrorState
-│   │   ├── GenerateButton
-│   │   ├── LoadingState
-│   │   └── Logo
-│   ├── data/
-│   │   ├── careers
-│   │   ├── news
-│   │   └── reviews
-│   ├── lib/
-│   │   ├── ai
-│   │   └── openrouter
-│   └── types/
-├── public/
-└── supabase/
-    └── migrations/
+│   ├── App1.tsx             profile form, navigation, page switching
+│   ├── components/          AnalysisPage, AutoComplete, CareerNode, CareersPage,
+│   │                        ErrorState, GenerateButton, LoadingState, Logo
+│   ├── data/                built-in example careers, reviews and listings
+│   ├── lib/ai.ts            client calls to /api/career-ai
+│   └── types.ts
+└── supabase/migrations/     earlier database schema (not used by the app)
 ```
 
-## Conclusion
-FutureFit AI represents a comprehensive solution for career guidance, leveraging modern technologies and AI capabilities to provide personalized career recommendations. The project's modular architecture and extensive feature set provide a solid foundation for future enhancements and scaling.
+## Deploy (Netlify)
+
+`netlify.toml` builds the site with `npm run build`, publishes `dist/` and deploys
+`netlify/functions/career-ai.mts`, which answers `/api/career-ai`. In the Netlify site settings, add
+the environment variable `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`).
+
+If an older build of this app was ever published, its JavaScript contained the Gemini key. Create a
+new key in Google AI Studio and delete the old one.
